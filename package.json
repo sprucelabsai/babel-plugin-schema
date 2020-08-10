@@ -16,7 +16,8 @@
     "clean": "rm -rf build/",
     "lint": "eslint '**/*.ts' && tsc -p . --noEmit",
     "lint.fix": "eslint --fix '**/*.ts'",
-    "lint.watch": "chokidar 'src/**/*' '../spruce-templates/src/**' -c 'yarn lint.tsc'"
+    "lint.watch": "chokidar 'src/**/*' '../spruce-templates/src/**' -c 'yarn lint.tsc'",
+    "release": "semantic-release",
   },
   "dependencies": {
     "fs-extra": "^9.0.1",
