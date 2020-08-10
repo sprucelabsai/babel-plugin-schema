@@ -26,6 +26,7 @@
     "tsconfig-paths": "^3.9.0"
   },
   "devDependencies": {
+    "@sprucelabs/semantic-release": "^4.0.5",
     "@sprucelabs/test": "^5.3.128",
     "@types/fs-extra": "^9.0.1",
     "@types/rimraf": "^3.0.0",
