@@ -1,0 +1,16 @@
+{
+  "name": "@sprucelabs/babel-plugin-schema",
+  "version": "1.0.0",
+  "description": "Builds @sprucelabs/schema and generates static paths to #spruce directories.",
+  "main": "index.js",
+  "repository": "git@github.com:sprucelabsai/babel-plugin-schema.git",
+  "author": "Spruce Labs",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "fs-extra": "^9.0.1",
+    "globby": "^11.0.1",
+    "rimraf": "^3.0.2",
+    "tsconfig-paths": "^3.9.0"
+  }
+}
