@@ -17,7 +17,9 @@
     "lint": "eslint '**/*.ts' && tsc -p . --noEmit",
     "lint.fix": "eslint --fix '**/*.ts'",
     "lint.watch": "chokidar 'src/**/*' '../spruce-templates/src/**' -c 'yarn lint.tsc'",
-    "release": "semantic-release"
+    "release": "semantic-release",
+    "upgrade.packages.all": "yarn upgrade --latest && rm yarn.lock | true && yarn | true && yarn lint.fix | true",
+    "upgrade.packages.test": "yarn upgrade.packages.all && yarn lint && yarn build && yarn test"
   },
   "dependencies": {
     "fs-extra": "^9.0.1",
