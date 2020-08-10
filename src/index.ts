@@ -59,8 +59,8 @@ export function copyAndMap(options: PluginOptions) {
 		rimRaf.sync(schemaNodeModules)
 	}
 
-	// now map paths to the new schema
-	const config = loadConfig(options.cwd)
+	// now map paths to the new schema using the config of the destination
+	const config = loadConfig(options.destination)
 	if (config.resultType === 'failed') {
 		throw new Error(config.message)
 	}
