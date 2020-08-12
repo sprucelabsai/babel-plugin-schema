@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@sprucelabs/semantic-release": "^4.0.5",
-    "@sprucelabs/test": "^5.3.140",
+    "@sprucelabs/test": "^5.3.141",
     "@types/fs-extra": "^9.0.1",
     "@types/rimraf": "^3.0.0",
     "eslint": "^7.6.0",
