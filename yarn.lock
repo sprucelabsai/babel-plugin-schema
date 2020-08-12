@@ -1319,10 +1319,10 @@
     conventional-changelog-sprucelabs "^1.1.0"
     semantic-release "^17.0.4"
 
-"@sprucelabs/test@^5.3.143":
-  version "5.3.143"
-  resolved "https://registry.yarnpkg.com/@sprucelabs/test/-/test-5.3.143.tgz#ed8e9a4b8a0247e265a37987fb8ce23a8d889206"
-  integrity sha512-7a2R9l9FFC2NlT9I/kPrYDUlmUPik7j/lEbt5oh+k5LjSAKnToKDi5XkD5GTBJDz5JxHoUKWDDyOA/yPCcFnLQ==
+"@sprucelabs/test@^5.3.144":
+  version "5.3.144"
+  resolved "https://registry.yarnpkg.com/@sprucelabs/test/-/test-5.3.144.tgz#072e957f29d6ed64d61d45f6221b987ade5f04e6"
+  integrity sha512-OQ4CsFgjDknDIMxjN5y6pj8pEUV1wLeu3RwuOolqtYEiJvKop4813sGC7hzHhHPpCGAzzj4WPl5MjwdRDgDEBg==
   dependencies:
     "@babel/core" "^7.11.1"
     "@babel/preset-env" "^7.11.0"
@@ -1918,9 +1918,9 @@ aws-sign2@~0.7.0:
   integrity sha1-tG6JCTSpWR8tL2+G1+ap8bP+dqg=
 
 aws4@^1.8.0:
-  version "1.10.0"
-  resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.10.0.tgz#a17b3a8ea811060e74d47d306122400ad4497ae2"
-  integrity sha512-3YDiu347mtVtjpyV3u5kVqQLP242c06zwDOgpeRnybmXlYYsLbtTrUBUm8i8srONt+FWobl5aibnU1030PeeuA==
+  version "1.10.1"
+  resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.10.1.tgz#e1e82e4f3e999e2cfd61b161280d16a111f86428"
+  integrity sha512-zg7Hz2k5lI8kb7U32998pRRFin7zJlkfezGJjUc2heaD4Pw2wObakCDVzkKztTm/Ln7eiVvYsjqak0Ed4LkMDA==
 
 axe-core@^3.5.4:
   version "3.5.5"
