@@ -22,7 +22,6 @@ export interface PluginOptions {
 }
 
 export function copyAndMap(options: PluginOptions) {
-	debugger
 	assert(
 		options.cwd,
 		"You must pass options.cwd. This is where I'll look for the schema module (root of workspace if in monorepo)"
