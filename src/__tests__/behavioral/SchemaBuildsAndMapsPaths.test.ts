@@ -2,10 +2,18 @@ import { exec } from 'child_process'
 import os from 'os'
 import AbstractSpruceTest, { test, assert } from '@sprucelabs/test'
 import fsUtil from 'fs-extra'
+import rimraf from 'rimraf'
 import { copyAndMap } from '../../index'
 
 export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 	protected static testDirsToDelete: string[] = []
+
+	protected static async afterAll() {
+		super.afterAll()
+		for (const dir of this.testDirsToDelete) {
+			rimraf.sync(dir)
+		}
+	}
 
 	@test()
 	protected static async buildsSchemaWithoutError() {
@@ -81,6 +89,8 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 		)
 
 		await fsUtil.ensureDir(cwd)
+
+		this.testDirsToDelete.push(cwd)
 
 		await new Promise((resolve, reject) => {
 			exec(
