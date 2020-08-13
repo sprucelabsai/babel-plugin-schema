@@ -22,6 +22,7 @@ export interface PluginOptions {
 }
 
 export function copyAndMap(options: PluginOptions) {
+	debugger
 	assert(
 		options.cwd,
 		"You must pass options.cwd. This is where I'll look for the schema module (root of workspace if in monorepo)"
@@ -41,9 +42,9 @@ export function copyAndMap(options: PluginOptions) {
 		let contents = fs.readFileSync(file).toString()
 		let found = false
 
-		contents = `${contents}`.replace(/"#spruce\/(.*?)"/gi, (match) => {
+		contents = `${contents}`.replace(/['"]#spruce\/(.*?)['"]/gi, (match) => {
 			found = true
-			const search = match.replace(/"/g, '')
+			const search = match.replace(/["']/g, '')
 			let resolved: string | undefined
 
 			if (outResolver) {
