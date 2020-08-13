@@ -45,7 +45,7 @@ export function copyAndMap(options: PluginOptions) {
 			found = true
 			const search = match.replace(/"/g, '')
 			let resolved: string | undefined
-			debugger
+
 			if (outResolver) {
 				resolved = outResolver(search, undefined, undefined, ['.js'])
 			}
