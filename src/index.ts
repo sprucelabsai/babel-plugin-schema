@@ -104,6 +104,7 @@ function buildOutResolver(
 			pathUtil.dirname(config.configFileAbsolutePath),
 			outDir
 		)
+
 		outResolver = createMatchPath(resolvedOutDir, config.paths)
 	}
 
