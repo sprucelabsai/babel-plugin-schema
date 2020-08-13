@@ -94,18 +94,27 @@ function buildOutResolver(
 	)
 
 	const {
-		compilerOptions: { outDir },
+		compilerOptions: { baseUrl, outDir },
 	} = fullTsConfig
 
 	let outResolver: MatchPath | undefined
 
 	if (outDir) {
-		const resolvedOutDir = pathUtil.join(
-			pathUtil.dirname(config.configFileAbsolutePath),
-			outDir
-		)
+		const resolver = createMatchPath(config.absoluteBaseUrl, config.paths)
+		outResolver = (
+			requested: string,
+			readJson?: any,
+			fileExists?: any,
+			extensions?: readonly string[]
+		) => {
+			let resolved = resolver(requested, readJson, fileExists, extensions)
+			resolved = resolved?.replace(
+				`${pathUtil.sep}${baseUrl}${pathUtil.sep}`,
+				`${pathUtil.sep}${outDir}${pathUtil.sep}`
+			)
 
-		outResolver = createMatchPath(resolvedOutDir, config.paths)
+			return resolved
+		}
 	}
 
 	return outResolver

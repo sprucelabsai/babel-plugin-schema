@@ -52,7 +52,7 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 			'.spruce'
 		)
 
-		const destinationHashSpruce = this.resolvePath(cwd, 'build', '.spruce')
+		const destinationHashSpruce = this.resolvePath(cwd, 'src', '.spruce')
 
 		await this.copyDir(sourceHashSpruce, destinationHashSpruce)
 
@@ -76,6 +76,7 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 
 		assert.doesNotInclude(afterMapContents, '#spruce')
 		assert.doesNotInclude(afterMapContents, '@sprucelabs/schema/build/.spruce/')
+		assert.doesInclude(afterMapContents, 'build/.spruce')
 	}
 
 	private static async copyDir(source: string, destination: string) {
