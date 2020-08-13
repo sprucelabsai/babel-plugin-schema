@@ -1,58 +1,61 @@
 {
-  "name": "@sprucelabs/babel-plugin-schema",
-  "version": "1.0.22",
-  "description": "Builds @sprucelabs/schema and generates static paths to #spruce directories.",
-  "main": "build/index.js",
-  "repository": "git@github.com:sprucelabsai/babel-plugin-schema.git",
-  "author": "Spruce Labs",
-  "license": "MIT",
-  "scripts": {
-    "test": "jest",
-    "test.watch": "jest --watch",
-    "build": "npm run clean && npm run build.tsc",
-    "build.tsc": "tsc",
-    "build.watch": "tsc -w",
-    "clean": "rm -rf build/",
-    "lint": "eslint '**/*.ts' && tsc -p . --noEmit",
-    "lint.fix": "eslint --fix '**/*.ts'",
-    "lint.watch": "chokidar 'src/**/*' '../spruce-templates/src/**' -c 'yarn lint.tsc'",
-    "release": "semantic-release",
-    "upgrade.packages": "yarn upgrade --latest && rm yarn.lock | true && yarn | true && yarn lint.fix | true",
-    "upgrade.packages.all": "yarn upgrade.packages",
-    "upgrade.packages.test": "yarn upgrade.packages.all && yarn lint && yarn build && yarn test"
-  },
-  "dependencies": {
-    "fs-extra": "^9.0.1",
-    "globby": "^11.0.1",
-    "rimraf": "^3.0.2",
-    "tsconfig-paths": "^3.9.0"
-  },
-  "devDependencies": {
-    "@sprucelabs/semantic-release": "^4.0.5",
-    "@sprucelabs/test": "^5.3.147",
-    "@types/fs-extra": "^9.0.1",
-    "@types/rimraf": "^3.0.0",
-    "eslint": "^7.6.0",
-    "eslint-config-spruce": "^10.8.8",
-    "jest": "^26.4.0",
-    "prettier": "^2.0.5",
-    "typescript": "^3.9.7"
-  },
-  "jest": {
-    "maxWorkers": 4,
-    "testTimeout": 120000,
-    "testEnvironment": "node",
-    "testPathIgnorePatterns": [
-      "<rootDir>/tmp/",
-      "<rootDir>/src/",
-      "<rootDir>/node_modules/",
-      "<rootDir>/build/__tests__/testDirsAndFiles/"
-    ],
-    "testMatch": [
-      "**/__tests__/**/*.test.js?(x)"
-    ],
-    "moduleNameMapper": {
-      "^#spruce/(.*)$": "<rootDir>/build/.spruce/$1"
-    }
-  }
+	"name": "@sprucelabs/babel-plugin-schema",
+	"version": "1.0.3",
+	"description": "Builds @sprucelabs/schema and generates static paths to #spruce directories.",
+	"main": "build/index.js",
+	"repository": "git@github.com:sprucelabsai/babel-plugin-schema.git",
+	"author": "Spruce Labs",
+	"license": "MIT",
+	"scripts": {
+		"test": "jest",
+		"test.watch": "jest --watch",
+		"build": "npm run clean && npm run build.tsc && yarn copy-test-files",
+		"build.tsc": "tsc",
+		"build.watch": "concurrently 'tsc -w' 'chokidar \"src/__tests__/files/*\" -c yarn copy-test-files'",
+		"clean": "rm -rf build/",
+		"lint": "eslint '**/*.ts' && tsc -p . --noEmit",
+		"lint.fix": "eslint --fix '**/*.ts'",
+		"lint.watch": "chokidar 'src/**/*' '../spruce-templates/src/**' -c 'yarn lint.tsc'",
+		"release": "semantic-release",
+		"upgrade.packages.all": "yarn upgrade --latest && rm yarn.lock | true && yarn | true && yarn lint.fix | true",
+		"upgrade.packages.test": "yarn upgrade.packages.all && yarn lint && yarn build && yarn test",
+		"copy-test-files": "rm -rf ./build/__tests__/files && mkdirp ./build/__tests__/files && cp -r ./src/__tests__/files/* ./build/__tests__/files"
+	},
+	"dependencies": {
+		"fs-extra": "^9.0.1",
+		"globby": "^11.0.1",
+		"rimraf": "^3.0.2",
+		"tsconfig-paths": "^3.9.0"
+	},
+	"devDependencies": {
+		"@sprucelabs/semantic-release": "^4.0.5",
+		"@sprucelabs/test": "^5.3.130",
+		"@types/fs-extra": "^9.0.1",
+		"@types/rimraf": "^3.0.0",
+		"chokidar": "^3.4.2",
+		"concurrently": "^5.3.0",
+		"copyfiles": "^2.3.0",
+		"eslint": "^7.6.0",
+		"eslint-config-spruce": "^10.8.2",
+		"jest": "^26.3.0",
+		"prettier": "^2.0.5",
+		"typescript": "^3.9.7"
+	},
+	"jest": {
+		"maxWorkers": 4,
+		"testTimeout": 120000,
+		"testEnvironment": "node",
+		"testPathIgnorePatterns": [
+			"<rootDir>/tmp/",
+			"<rootDir>/src/",
+			"<rootDir>/node_modules/",
+			"<rootDir>/build/__tests__/testDirsAndFiles/"
+		],
+		"testMatch": [
+			"**/__tests__/**/*.test.js?(x)"
+		],
+		"moduleNameMapper": {
+			"^#spruce/(.*)$": "<rootDir>/build/.spruce/$1"
+		}
+	}
 }
