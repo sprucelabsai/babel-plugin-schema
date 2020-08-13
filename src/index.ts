@@ -3,7 +3,12 @@ import pathUtil from 'path'
 import fsExtra from 'fs-extra'
 import globby from 'globby'
 import rimRaf from 'rimraf'
-import { loadConfig, createMatchPath } from 'tsconfig-paths'
+import {
+	loadConfig,
+	createMatchPath,
+	MatchPath,
+	ConfigLoaderSuccessResult,
+} from 'tsconfig-paths'
 
 function assert(truthy: any, message: string) {
 	if (!truthy) {
@@ -16,7 +21,6 @@ export interface PluginOptions {
 	destination: string
 }
 
-// const DIVIDER = "\n\n\n************************************************\n\n\n";
 export function copyAndMap(options: PluginOptions) {
 	assert(
 		options.cwd,
@@ -27,7 +31,86 @@ export function copyAndMap(options: PluginOptions) {
 		'You need to pass a options.destination (sub project if mono repo)'
 	)
 
-	// places to look for schema
+	const destination = ensureDirsAndResolveDestination(options)
+
+	let { outResolver, srcResolver } = buildResolvers(destination)
+
+	const files = globby.sync(pathUtil.join(destination, '**/*.js'))
+
+	files.forEach((file) => {
+		let contents = fs.readFileSync(file).toString()
+		let found = false
+
+		contents = `${contents}`.replace(/"#spruce\/(.*?)"/gi, (match) => {
+			found = true
+			const search = match.replace(/"/g, '')
+			let resolved: string | undefined
+
+			if (outResolver) {
+				resolved = outResolver(search, undefined, undefined, ['.js'])
+			}
+
+			if (!resolved) {
+				resolved = srcResolver(search, undefined, undefined, ['.ts', '.js'])
+			}
+
+			if (!resolved) {
+				throw new Error(`Could not map ${search}.`)
+			}
+			return `"${resolved}"`
+		})
+
+		if (found) {
+			fs.writeFileSync(file, contents)
+		}
+	})
+}
+
+function buildResolvers(
+	destination: string
+): {
+	outResolver: MatchPath | undefined
+	srcResolver: MatchPath
+} {
+	const config = loadConfig(destination)
+
+	if (config.resultType === 'failed') {
+		throw new Error(config.message)
+	}
+
+	const { paths, absoluteBaseUrl } = config
+	const srcResolver = createMatchPath(absoluteBaseUrl, paths)
+
+	const outResolver = buildOutResolver(config)
+
+	return { outResolver, srcResolver }
+}
+
+function buildOutResolver(
+	config: ConfigLoaderSuccessResult
+): MatchPath | undefined {
+	const fullTsConfig = JSON.parse(
+		fs.readFileSync(config.configFileAbsolutePath).toString()
+	)
+
+	const {
+		compilerOptions: { outDir },
+	} = fullTsConfig
+
+	let outResolver: MatchPath | undefined
+
+	if (outDir) {
+		const resolvedOutDir = pathUtil.join(
+			pathUtil.dirname(config.configFileAbsolutePath),
+			outDir
+		)
+		outResolver = createMatchPath(resolvedOutDir, config.paths)
+	}
+
+	return outResolver
+}
+
+function ensureDirsAndResolveDestination(options: PluginOptions) {
 	const target = pathUtil.join(
 		options.cwd,
 		'node_modules',
@@ -58,35 +141,7 @@ export function copyAndMap(options: PluginOptions) {
 	if (fs.existsSync(schemaNodeModules)) {
 		rimRaf.sync(schemaNodeModules)
 	}
-
-	// now map paths to the new schema using the config of the destination
-	const config = loadConfig(options.destination)
-	if (config.resultType === 'failed') {
-		throw new Error(config.message)
-	}
-
-	const { absoluteBaseUrl, paths } = config
-	const resolver = createMatchPath(absoluteBaseUrl, paths)
-	const files = globby.sync(pathUtil.join(destination, '**/*.js'))
-
-	files.forEach((file) => {
-		let contents = fs.readFileSync(file).toString()
-		let found = false
-
-		contents = `${contents}`.replace(/"#spruce\/(.*?)"/gi, (match) => {
-			found = true
-			const search = match.replace(/"/g, '')
-			const resolved = resolver(search + '.js')
-			if (!resolved) {
-				throw new Error(`Could not map ${search}.`)
-			}
-			return `"${resolved}"`
-		})
-
-		if (found) {
-			fs.writeFileSync(file, contents)
-		}
-	})
+	return destination
 }
 
 export default function (_: any, options: PluginOptions) {

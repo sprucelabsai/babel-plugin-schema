@@ -1,22 +1,22 @@
 import { exec } from 'child_process'
 import os from 'os'
-import pathUtil from 'path'
 import AbstractSpruceTest, { test, assert } from '@sprucelabs/test'
 import fsUtil from 'fs-extra'
 import { copyAndMap } from '../../index'
 
 export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
+	protected static testDirsToDelete: string[] = []
+
 	@test()
 	protected static async buildsSchemaWithoutError() {
 		const cwd = await this.setupNewPackage()
 
-		const fieldFactoryFile = pathUtil.join(
+		const fieldFactoryFile = this.resolvePath(
 			cwd,
 			'node_modules/@sprucelabs/schema',
 			'build/factories/FieldFactory.js'
 		)
 		const contents = fsUtil.readFileSync(fieldFactoryFile).toString()
-
 		assert.doesInclude(contents, '#spruce')
 
 		copyAndMap({ cwd, destination: cwd })
@@ -25,9 +25,56 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 		assert.doesNotInclude(afterMapContents, '#spruce')
 	}
 
+	@test()
+	protected static async buildsSchemaAndUsesTheHashSpruceVersionOfFiles() {
+		const cwd = await this.setupNewPackage()
+
+		// copy schema files
+		const sourceHashSpruce = this.resolvePath(
+			cwd,
+			'node_modules',
+			'@sprucelabs/schema',
+			'build',
+			'.spruce'
+		)
+		const destinationHashSpruce = this.resolvePath(cwd, 'src', '.spruce')
+
+		await this.copyDir(sourceHashSpruce, destinationHashSpruce)
+
+		// copy ts config
+		const sourceTsConfig = this.resolvePath(
+			'build',
+			'__tests__',
+			'files',
+			'test-tsconfig.json'
+		)
+		const tsConfigContents = fsUtil.readFileSync(sourceTsConfig)
+		const destinationTsConfig = this.resolvePath(cwd, 'tsconfig.json')
+
+		fsUtil.writeFileSync(destinationTsConfig, tsConfigContents)
+
+		copyAndMap({ cwd, destination: cwd })
+	}
+
+	private static async copyDir(source: string, destination: string) {
+		fsUtil.ensureDir(destination)
+		return new Promise((resolve) => {
+			exec(
+				`cd ${source} && tar cf - . | (cd ${destination}; tar xf -)`,
+				{ maxBuffer: 1024 * 1024 * 5 },
+				(err, stdout) => {
+					if (err) {
+						throw err
+					}
+					resolve(stdout)
+				}
+			)
+		})
+	}
+
 	private static async setupNewPackage() {
 		const today = new Date()
-		const cwd = pathUtil.join(
+		const cwd = this.resolvePath(
 			os.tmpdir(),
 			'babel-plugin-schema',
 			`${today.getTime()}`
@@ -55,9 +102,12 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 		})
 
 		const tsConfigContents = fsUtil.readFileSync(
-			pathUtil.join(__dirname, '..', '..', '..', 'tsconfig.json')
+			this.resolvePath(__dirname, '..', '..', '..', 'tsconfig.json')
 		)
-		fsUtil.writeFileSync(pathUtil.join(cwd, 'tsconfig.json'), tsConfigContents)
+		fsUtil.writeFileSync(
+			this.resolvePath(cwd, 'tsconfig.json'),
+			tsConfigContents
+		)
 		return cwd
 	}
 }
