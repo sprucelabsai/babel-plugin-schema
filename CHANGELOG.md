@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/sprucelabsai/babel-plugin-schema/compare/v1.0.22...v1.1.0) (2020-08-13)
+
+
+### Features
+
+* checks outDir first for built file ([037e2f8](https://github.com/sprucelabsai/babel-plugin-schema/commit/037e2f8))
+
 ## [1.0.22](https://github.com/sprucelabsai/babel-plugin-schema/compare/v1.0.21...v1.0.22) (2020-08-12)
 
 ## [1.0.21](https://github.com/sprucelabsai/babel-plugin-schema/compare/v1.0.20...v1.0.21) (2020-08-12)
