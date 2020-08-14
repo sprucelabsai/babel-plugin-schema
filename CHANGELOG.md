@@ -1,3 +1,10 @@
+## [1.1.7](https://github.com/sprucelabsai/babel-plugin-schema/compare/v1.1.6...v1.1.7) (2020-08-14)
+
+
+### Bug Fixes
+
+* wait for the directory to exist ([f410de1](https://github.com/sprucelabsai/babel-plugin-schema/commit/f410de1))
+
 ## [1.1.6](https://github.com/sprucelabsai/babel-plugin-schema/compare/v1.1.5...v1.1.6) (2020-08-14)
 
 ## [1.1.5](https://github.com/sprucelabsai/babel-plugin-schema/compare/v1.1.4...v1.1.5) (2020-08-14)
