@@ -80,7 +80,7 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 	}
 
 	private static async copyDir(source: string, destination: string) {
-		fsUtil.ensureDir(destination)
+		await fsUtil.ensureDir(destination)
 		return new Promise((resolve) => {
 			exec(
 				`cd ${source} && tar cf - . | (cd ${destination}; tar xf -)`,
