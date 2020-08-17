@@ -1319,10 +1319,10 @@
     conventional-changelog-sprucelabs "^1.1.0"
     semantic-release "^17.0.4"
 
-"@sprucelabs/test@^6.0.11":
-  version "6.0.11"
-  resolved "https://registry.yarnpkg.com/@sprucelabs/test/-/test-6.0.11.tgz#998ba1fc9b6025dd60df83e2e20079cc8e8f9263"
-  integrity sha512-Vpf8GgkzR9d0gVS1ZzMBi5aN0s5J5eMqAG9BwCnRJZRAJYxs8Aw2y0Wf9xpoqI/zaUIhL0I3YAESrQI7ClXIgw==
+"@sprucelabs/test@^6.0.12":
+  version "6.0.12"
+  resolved "https://registry.yarnpkg.com/@sprucelabs/test/-/test-6.0.12.tgz#21ad880f11efc03ea7c4eb3d4d80ece75767c598"
+  integrity sha512-Vbh83fCXg2/52dsr6dDCnSCc5sFUqDMmvPsmTSY1Ammm7Him//vmZYhcuRZDqlGThSVN8YEGBr1//cGaqb4Gzw==
   dependencies:
     "@babel/core" "^7.11.1"
     "@babel/preset-env" "^7.11.0"
@@ -1460,9 +1460,9 @@
   integrity sha1-aaI6OtKcrwCX8G7aWbNh7i8GOfY=
 
 "@types/node@*", "@types/node@>= 8":
-  version "14.0.27"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.0.27.tgz#a151873af5a5e851b51b3b065c9e63390a9e0eb1"
-  integrity sha512-kVrqXhbclHNHGu9ztnAwSncIgJv/FaxmzXJvGXNdcCpV1b8u1/Mi6z6m0vwy0LzKeXFTPLH0NzwmoJ3fNCIq0g==
+  version "14.6.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.6.0.tgz#7d4411bf5157339337d7cff864d9ff45f177b499"
+  integrity sha512-mikldZQitV94akrc4sCcSjtJfsTKt4p+e/s0AGscVA6XArQ9kFclP+ZiYUMnq987rc6QlYxXv/EivqlfSLxpKA==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.0"
