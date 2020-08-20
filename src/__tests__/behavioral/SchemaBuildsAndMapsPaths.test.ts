@@ -9,7 +9,7 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 	protected static testDirsToDelete: string[] = []
 
 	protected static async afterAll() {
-		super.afterAll()
+		await super.afterAll()
 		for (const dir of this.testDirsToDelete) {
 			rimraf.sync(dir)
 		}
