@@ -1317,10 +1317,10 @@
     conventional-changelog-sprucelabs "^1.1.0"
     semantic-release "^17.0.4"
 
-"@sprucelabs/test@^6.0.39":
-  version "6.0.39"
-  resolved "https://registry.yarnpkg.com/@sprucelabs/test/-/test-6.0.39.tgz#423a08f49f4e04500410ca9319f39dbf06abacbe"
-  integrity sha512-foQk08wQMG7ny0i2W0qu09FSOCcUnEGXbAbMp4vZxk6TA5aP1MQmkz8JTje6Njvs5Y52uNtJVdWjKD5JwZSapg==
+"@sprucelabs/test@^6.0.40":
+  version "6.0.40"
+  resolved "https://registry.yarnpkg.com/@sprucelabs/test/-/test-6.0.40.tgz#981d903d5988a2ba281dabedd4c539aabba17392"
+  integrity sha512-8BjhYOrzsoK3MadR0d//2CttjMKznznDzMGn8lmbxphBHFA+wh9thCVfamLdcMg+MzUSphBBwDuZKia1hEiWgQ==
   dependencies:
     "@babel/core" "^7.11.4"
     "@babel/preset-env" "^7.11.0"
@@ -8436,9 +8436,9 @@ typescript@^4.0.2:
   integrity sha512-e4ERvRV2wb+rRZ/IQeb3jm2VxBsirQLpQhdxplZ2MEzGvDkkMmPglecnNDfSUBivMjP93vRbngYYDQqQ/78bcQ==
 
 uglify-js@^3.1.4:
-  version "3.10.1"
-  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.10.1.tgz#dd14767eb7150de97f2573a5ff210db14fffe4ad"
-  integrity sha512-RjxApKkrPJB6kjJxQS3iZlf///REXWYxYJxO/MpmlQzVkDWVI3PSnCBWezMecmTU/TRkNxrl8bmsfFQCp+LO+Q==
+  version "3.10.2"
+  resolved "https://registry.yarnpkg.com/uglify-js/-/uglify-js-3.10.2.tgz#8cfa1209fd04199cc8a7f9930ddedb30b0f1912d"
+  integrity sha512-GXCYNwqoo0MbLARghYjxVBxDCnU0tLqN7IPLdHHbibCb1NI5zBkU2EPcy/GaVxc0BtTjqyGXJCINe6JMR2Dpow==
 
 uid-number@0.0.6:
   version "0.0.6"
