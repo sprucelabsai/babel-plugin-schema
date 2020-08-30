@@ -29,14 +29,14 @@
 	},
 	"devDependencies": {
 		"@sprucelabs/semantic-release": "^4.0.5",
-		"@sprucelabs/test": "^6.0.88",
+		"@sprucelabs/test": "^6.0.89",
 		"@types/fs-extra": "^9.0.1",
 		"@types/rimraf": "^3.0.0",
 		"chokidar": "^3.4.2",
 		"concurrently": "^5.3.0",
 		"copyfiles": "^2.3.0",
 		"eslint": "^7.7.0",
-		"eslint-config-spruce": "^10.9.19",
+		"eslint-config-spruce": "^10.9.20",
 		"jest": "^26.4.2",
 		"prettier": "^2.1.1",
 		"typescript": "^4.0.2"
