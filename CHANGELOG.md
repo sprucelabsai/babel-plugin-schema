@@ -1,3 +1,11 @@
+## [1.1.122](https://github.com/sprucelabsai/babel-plugin-schema/compare/v1.1.121...v1.1.122) (2020-09-03)
+
+
+### Bug Fixes
+
+* ignore the empty_skill directory ([04504df](https://github.com/sprucelabsai/babel-plugin-schema/commit/04504df))
+* test building full skill with babel ([045ddb3](https://github.com/sprucelabsai/babel-plugin-schema/commit/045ddb3))
+
 ## [1.1.121](https://github.com/sprucelabsai/babel-plugin-schema/compare/v1.1.120...v1.1.121) (2020-09-03)
 
 ## [1.1.120](https://github.com/sprucelabsai/babel-plugin-schema/compare/v1.1.119...v1.1.120) (2020-09-03)
