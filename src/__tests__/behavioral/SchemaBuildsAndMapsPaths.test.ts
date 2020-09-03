@@ -21,6 +21,7 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 
 		const fieldFactoryFile = this.fieldFactoryFilepath(cwd)
 		const contents = fsUtil.readFileSync(fieldFactoryFile).toString()
+
 		assert.doesInclude(contents, '#spruce')
 
 		copyAndMap({ cwd, destination: cwd })
@@ -56,19 +57,6 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 
 		await this.copyDir(sourceHashSpruce, destinationHashSpruce)
 
-		// copy ts config
-		const sourceTsConfig = this.resolvePath(
-			'src',
-			'__tests__',
-			'files',
-			'test-tsconfig.json'
-		)
-
-		const tsConfigContents = fsUtil.readFileSync(sourceTsConfig)
-		const destinationTsConfig = this.resolvePath(cwd, 'tsconfig.json')
-
-		fsUtil.writeFileSync(destinationTsConfig, tsConfigContents)
-
 		copyAndMap({ cwd, destination: cwd })
 
 		const fieldFactoryFile = this.fieldFactoryFilepath(cwd)
@@ -77,6 +65,33 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 		assert.doesNotInclude(afterMapContents, '#spruce')
 		assert.doesNotInclude(afterMapContents, '@sprucelabs/schema/build/.spruce/')
 		assert.doesInclude(afterMapContents, 'build/.spruce')
+	}
+
+	@test()
+	protected static async testBuildingFullSkillWithBabel() {
+		const cwd = await this.setupNewCwd()
+
+		const sourceDir = this.resolvePath('src', '__tests__', 'empty_skill')
+		await this.copyDir(sourceDir, cwd)
+
+		const buildIndex = this.resolvePath('build', 'index.js')
+		const babelFile = this.resolvePath(cwd, 'babel.config.js')
+		let babelContents = fsUtil
+			.readFileSync(babelFile)
+			.toString()
+			.replace('{{schema-plugin}}', buildIndex)
+		fsUtil.writeFileSync(babelFile, babelContents)
+
+		await this.runCommand(cwd, 'yarn')
+		await this.runCommand(cwd, 'yarn build')
+
+		const checkFile = this.resolvePath(
+			cwd,
+			'node_modules/@sprucelabs/schema/build/factories/FieldFactory.js'
+		)
+		const checkFileContents = fsUtil.readFileSync(checkFile).toString()
+
+		assert.doesNotInclude(checkFileContents, 'src/.spruce')
 	}
 
 	private static async copyDir(source: string, destination: string) {
@@ -98,8 +113,6 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 	private static async setupNewPackage() {
 		const cwd = await this.setupNewCwd()
 
-		this.testDirsToDelete.push(cwd)
-
 		await this.invokeYarnCommands(cwd)
 
 		this.copyTsConfig(cwd)
@@ -118,12 +131,14 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 
 		await fsUtil.ensureDir(cwd)
 
+		this.testDirsToDelete.push(cwd)
+
 		return cwd
 	}
 
 	private static copyTsConfig(cwd: string) {
 		const tsConfigContents = fsUtil.readFileSync(
-			this.resolvePath(__dirname, '..', '..', '..', 'tsconfig.json')
+			this.resolvePath('src', '__tests__', 'files', 'test-tsconfig.json')
 		)
 
 		fsUtil.writeFileSync(
@@ -133,9 +148,13 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 	}
 
 	private static async invokeYarnCommands(cwd: string) {
+		await this.runCommand(cwd, `yarn init --yes && yarn add @sprucelabs/schema`)
+	}
+
+	private static async runCommand(cwd: string, command: string) {
 		await new Promise((resolve, reject) => {
 			exec(
-				`yarn init --yes && yarn add @sprucelabs/schema`,
+				command,
 				{
 					cwd,
 					env: {

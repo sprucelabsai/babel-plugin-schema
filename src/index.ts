@@ -47,7 +47,7 @@ export function copyAndMap(options: PluginOptions) {
 			let resolved: string | undefined
 
 			if (outResolver) {
-				resolved = outResolver(search, undefined, undefined, ['.js'])
+				resolved = outResolver(search, undefined, undefined, ['.ts', '.js'])
 			}
 
 			if (!resolved) {
