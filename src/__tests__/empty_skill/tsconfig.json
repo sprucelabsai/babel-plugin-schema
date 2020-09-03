@@ -22,8 +22,7 @@
 		"experimentalDecorators": true,
 		"paths": {
 			"#spruce/*": [
-				".spruce/*",
-				"../node_modules/@sprucelabs/schema/build/.spruce/*"
+				".spruce/*"
 			]
 		}
 	},

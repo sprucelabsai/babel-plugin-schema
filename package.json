@@ -9,9 +9,9 @@
 	"scripts": {
 		"test": "jest",
 		"test.watch": "jest --watch",
-		"build": "npm run clean && npm run build.tsc && yarn copy-test-files",
+		"build": "npm run clean && npm run build.tsc && yarn copy-for-tests",
 		"build.tsc": "tsc",
-		"build.watch": "concurrently 'tsc -w' 'chokidar \"src/__tests__/files/*\" -c yarn copy-test-files'",
+		"build.watch": "concurrently 'tsc -w' 'chokidar \"src/__tests__/files/*\" -c yarn copy-for-tests'",
 		"clean": "rm -rf build/",
 		"lint": "eslint '**/*.ts' && tsc -p . --noEmit",
 		"lint.fix": "eslint --fix '**/*.ts'",
@@ -19,7 +19,9 @@
 		"release": "semantic-release",
 		"upgrade.packages.all": "yarn upgrade --latest && rm yarn.lock | true && yarn | true && yarn lint.fix | true",
 		"upgrade.packages.test": "yarn upgrade.packages.all && yarn lint && yarn build && yarn test",
-		"copy-test-files": "rm -rf ./build/__tests__/files && mkdirp ./build/__tests__/files && cp -r ./src/__tests__/files/* ./build/__tests__/files"
+		"copy-for-tests": "yarn copy-test-files && yarn copy-test-empty-skill",
+		"copy-test-files": "rm -rf ./build/__tests__/files && mkdirp ./build/__tests__/files && cp -r ./src/__tests__/files/* ./build/__tests__/files",
+		"copy-test-empty-skill": "rm -rf ./build/__tests__/empty_skill && mkdirp ./build/__tests__/empty_skill && cp -r ./src/__tests__/empty_skill/* ./build/__tests__/empty_skill"
 	},
 	"dependencies": {
 		"fs-extra": "^9.0.1",
