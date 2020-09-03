@@ -27,6 +27,6 @@
     ],
     "exclude": [
         "build",
-        "src/__test__/empty_skill/**"
+        "src/__tests__/empty_skill"
     ]
 }
