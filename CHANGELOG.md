@@ -1,3 +1,5 @@
+## [2.0.1](https://github.com/sprucelabsai/babel-plugin-schema/compare/v2.0.0...v2.0.1) (2020-09-04)
+
 # [2.0.0](https://github.com/sprucelabsai/babel-plugin-schema/compare/v1.2.1...v2.0.0) (2020-09-04)
 
 
