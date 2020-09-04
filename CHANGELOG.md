@@ -1,3 +1,10 @@
+# [2.0.0](https://github.com/sprucelabsai/babel-plugin-schema/compare/v1.2.1...v2.0.0) (2020-09-04)
+
+
+### Breaking Changes
+
+* better matching and mapping happens seperate from copy of schema ([0845d89](https://github.com/sprucelabsai/babel-plugin-schema/commit/0845d89))
+
 ## [1.2.1](https://github.com/sprucelabsai/babel-plugin-schema/compare/v1.2.0...v1.2.1) (2020-09-04)
 
 # [1.2.0](https://github.com/sprucelabsai/babel-plugin-schema/compare/v1.1.128...v1.2.0) (2020-09-04)
