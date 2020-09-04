@@ -21,7 +21,7 @@ export interface PluginOptions {
 	destination: string
 }
 
-export function copyAndMap(options: PluginOptions) {
+export function copy(options: PluginOptions) {
 	assert(
 		options.cwd,
 		"You must pass options.cwd. This is where I'll look for the schema module (root of workspace if in monorepo)"
@@ -31,9 +31,7 @@ export function copyAndMap(options: PluginOptions) {
 		'You need to pass a options.destination (sub project if mono repo)'
 	)
 
-	const destination = ensureDirsAndResolveDestination(options)
-
-	resolveHashSpruceAliases(destination)
+	ensureDirsAndResolveDestination(options)
 }
 
 export function resolveHashSpruceAliases(destination: string) {
@@ -48,26 +46,29 @@ export function resolveHashSpruceAliases(destination: string) {
 		let contents = fs.readFileSync(file).toString()
 		let found = false
 
-		contents = `${contents}`.replace(/['"]#spruce\/(.*?)['"]/gi, (match) => {
-			found = true
-			const search = match.replace(/["']/g, '')
-			let resolved: string | undefined
+		contents = `${contents}`.replace(
+			/(from |import |require\()['"](#spruce\/(.*?))['"]/gi,
+			(_, requireOrImport, match) => {
+				found = true
+				const search = match
+				let resolved: string | undefined
 
-			if (outResolver) {
-				resolved = outResolver(search, undefined, undefined, ['.ts', '.js'])
+				if (outResolver) {
+					resolved = outResolver(search, undefined, undefined, ['.ts', '.js'])
+				}
+
+				if (!resolved) {
+					resolved = srcResolver(search, undefined, undefined, ['.ts', '.js'])
+				}
+
+				if (!resolved) {
+					throw new Error(`Could not map ${search} in ${file}.`)
+				}
+
+				const relative = pathUtil.relative(pathUtil.dirname(file), resolved)
+				return `${requireOrImport}"./${relative}"`
 			}
-
-			if (!resolved) {
-				resolved = srcResolver(search, undefined, undefined, ['.ts', '.js'])
-			}
-
-			if (!resolved) {
-				throw new Error(`Could not map ${search}.`)
-			}
-
-			const relative = pathUtil.relative(pathUtil.dirname(file), resolved)
-			return `"./${relative}"`
-		})
+		)
 
 		if (found) {
 			fs.writeFileSync(file, contents)
@@ -164,6 +165,6 @@ function ensureDirsAndResolveDestination(options: PluginOptions) {
 }
 
 export default function (_: any, options: PluginOptions) {
-	copyAndMap(options)
+	copy(options)
 	return {}
 }
