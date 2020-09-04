@@ -16,7 +16,7 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 	}
 
 	@test()
-	protected static async buildsSchemaWithoutError() {
+	protected static async buildsSchemaWithoutErrorWithoutLocalHashSpruce() {
 		const cwd = await this.setupNewPackage()
 
 		const fieldFactoryFile = this.fieldFactoryFilepath(cwd)
@@ -28,8 +28,12 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 
 		const afterMapContents = fsUtil.readFileSync(fieldFactoryFile).toString()
 
+		assert.doesNotInclude(afterMapContents, cwd)
 		assert.doesNotInclude(afterMapContents, '#spruce')
-		assert.doesInclude(afterMapContents, '@sprucelabs/schema/build/.spruce/')
+		assert.doesInclude(
+			afterMapContents,
+			'./../.spruce/schemas/fields/fieldClassMap'
+		)
 	}
 
 	private static fieldFactoryFilepath(cwd: string) {
@@ -41,7 +45,7 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 	}
 
 	@test()
-	protected static async buildsSchemaAndUsesTheHashSpruceVersionOfFiles() {
+	protected static async buildsSchemaAndUsesTheLocalHashSpruceVersionOfFiles() {
 		const cwd = await this.setupNewPackage()
 
 		// copy schema files
@@ -63,8 +67,10 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 		const afterMapContents = fsUtil.readFileSync(fieldFactoryFile).toString()
 
 		assert.doesNotInclude(afterMapContents, '#spruce')
-		assert.doesNotInclude(afterMapContents, '@sprucelabs/schema/build/.spruce/')
-		assert.doesInclude(afterMapContents, 'build/.spruce')
+		assert.doesInclude(
+			afterMapContents,
+			'./../../../../../build/.spruce/schemas/fields/fieldClassMap'
+		)
 	}
 
 	@test()
@@ -85,13 +91,14 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 		await this.runCommand(cwd, 'yarn')
 		await this.runCommand(cwd, 'yarn build')
 
-		const checkFile = this.resolvePath(
-			cwd,
-			'node_modules/@sprucelabs/schema/build/factories/FieldFactory.js'
-		)
+		const checkFile = this.fieldFactoryFilepath(cwd)
 		const checkFileContents = fsUtil.readFileSync(checkFile).toString()
 
 		assert.doesNotInclude(checkFileContents, 'src/.spruce')
+		assert.doesInclude(
+			checkFileContents,
+			'./../../../../../build/.spruce/schemas/fields/fieldClassMap'
+		)
 	}
 
 	private static async copyDir(source: string, destination: string) {
