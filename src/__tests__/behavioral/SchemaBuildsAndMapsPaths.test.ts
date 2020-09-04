@@ -1,9 +1,10 @@
 import { exec } from 'child_process'
 import os from 'os'
+import pathUtil from 'path'
 import AbstractSpruceTest, { test, assert } from '@sprucelabs/test'
 import fsUtil from 'fs-extra'
 import rimraf from 'rimraf'
-import { copyAndMap } from '../../index'
+import { copy, resolveHashSpruceAliases } from '../../index'
 
 export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 	protected static testDirsToDelete: string[] = []
@@ -24,7 +25,7 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 
 		assert.doesInclude(contents, '#spruce')
 
-		copyAndMap({ cwd, destination: cwd })
+		this.copyAndMap(cwd)
 
 		const afterMapContents = fsUtil.readFileSync(fieldFactoryFile).toString()
 
@@ -33,6 +34,56 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 		assert.doesInclude(
 			afterMapContents,
 			'./../.spruce/schemas/fields/fieldClassMap'
+		)
+	}
+
+	private static copyAndMap(cwd: string) {
+		copy({ cwd, destination: cwd })
+		resolveHashSpruceAliases(cwd)
+	}
+
+	@test()
+	protected static async testVariousMatches() {
+		const cwd = await this.setupNewPackage()
+
+		const importFileTarget = this.resolvePath(
+			'src',
+			'__tests__',
+			'files',
+			'import-test.ts'
+		)
+
+		const importFileContents = fsUtil.readFileSync(importFileTarget)
+		const destination = this.resolvePath(cwd, 'src', 'test-import.d.ts')
+		fsUtil.ensureDirSync(pathUtil.dirname(destination))
+		fsUtil.writeFileSync(destination, importFileContents)
+
+		this.copyAndMap(cwd)
+
+		const updatedContents = fsUtil.readFileSync(destination).toString()
+		assert.isEqual(
+			updatedContents.trim(),
+			`/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+//@ts-ignore
+import skill from "./../node_modules/@sprucelabs/schema/build/.spruce/schemas/fields/fields.types"
+//@ts-ignore
+import skill2 from "./../node_modules/@sprucelabs/schema/build/.spruce/schemas/fields/fields.types"
+
+import "./../node_modules/@sprucelabs/schema/build/.spruce/schemas/fields/fields.types"
+
+require("./../node_modules/@sprucelabs/schema/build/.spruce/schemas/fields/fields.types")
+require("./../node_modules/@sprucelabs/schema/build/.spruce/schemas/fields/fields.types")
+
+const leaveThis = '#spruce/schemas/fields/fields.types'
+const doNotTouch = '#spruce/schemas/fields/fields.types'
+
+console.log(leaveThis, doNotTouch)
+function leaveAsIs(str: string) {
+	console.log(str)
+}
+
+leaveAsIs('#spruce/schemas/fields/fields.types')`
 		)
 	}
 
@@ -61,7 +112,7 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 
 		await this.copyDir(sourceHashSpruce, destinationHashSpruce)
 
-		copyAndMap({ cwd, destination: cwd })
+		this.copyAndMap(cwd)
 
 		const fieldFactoryFile = this.fieldFactoryFilepath(cwd)
 		const afterMapContents = fsUtil.readFileSync(fieldFactoryFile).toString()
@@ -86,6 +137,7 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 			.readFileSync(babelFile)
 			.toString()
 			.replace('{{schema-plugin}}', buildIndex)
+
 		fsUtil.writeFileSync(babelFile, babelContents)
 
 		await this.runCommand(cwd, 'yarn')
