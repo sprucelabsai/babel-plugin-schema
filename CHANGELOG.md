@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/sprucelabsai/babel-plugin-schema/compare/v1.1.128...v1.2.0) (2020-09-04)
+
+
+### Features
+
+* resolve types file with resolve-path-aliases command ([d29135d](https://github.com/sprucelabsai/babel-plugin-schema/commit/d29135d))
+
 ## [1.1.128](https://github.com/sprucelabsai/babel-plugin-schema/compare/v1.1.127...v1.1.128) (2020-09-04)
 
 ## [1.1.127](https://github.com/sprucelabsai/babel-plugin-schema/compare/v1.1.126...v1.1.127) (2020-09-04)
