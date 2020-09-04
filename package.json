@@ -6,6 +6,9 @@
 	"repository": "git@github.com:sprucelabsai/babel-plugin-schema.git",
 	"author": "Spruce Labs",
 	"license": "MIT",
+	"bin": {
+		"resolve-path-aliases": "./build/resolve-path-aliases.js"
+	},
 	"scripts": {
 		"test": "jest",
 		"test.watch": "jest --watch",

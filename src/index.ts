@@ -33,9 +33,16 @@ export function copyAndMap(options: PluginOptions) {
 
 	const destination = ensureDirsAndResolveDestination(options)
 
+	resolveHashSpruceAliases(destination)
+}
+
+export function resolveHashSpruceAliases(destination: string) {
 	let { outResolver, srcResolver } = buildResolvers(destination)
 
-	const files = globby.sync(pathUtil.join(destination, '**/*.js'))
+	const files = globby.sync([
+		pathUtil.join(destination, '**/*.js'),
+		pathUtil.join(destination, '**/*.d.ts'),
+	])
 
 	files.forEach((file) => {
 		let contents = fs.readFileSync(file).toString()
@@ -57,7 +64,9 @@ export function copyAndMap(options: PluginOptions) {
 			if (!resolved) {
 				throw new Error(`Could not map ${search}.`)
 			}
-			return `"${resolved}"`
+
+			const relative = pathUtil.relative(pathUtil.dirname(file), resolved)
+			return `"./${relative}"`
 		})
 
 		if (found) {
@@ -79,8 +88,8 @@ function buildResolvers(
 	}
 
 	const { paths, absoluteBaseUrl } = config
-	const srcResolver = createMatchPath(absoluteBaseUrl, paths)
 
+	const srcResolver = createMatchPath(absoluteBaseUrl, paths)
 	const outResolver = buildOutResolver(config)
 
 	return { outResolver, srcResolver }
