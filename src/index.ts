@@ -21,6 +21,11 @@ export interface PluginOptions {
 	destination: string
 }
 
+export interface IResolvePathAliasOptions {
+	patterns?: string[]
+	absoluteOrRelative?: 'relative' | 'absolute'
+}
+
 export function copy(options: PluginOptions) {
 	assert(
 		options.cwd,
@@ -34,13 +39,17 @@ export function copy(options: PluginOptions) {
 	ensureDirsAndResolveDestination(options)
 }
 
-export function resolveHashSpruceAliases(destination: string) {
+export function resolvePathAliases(
+	destination: string,
+	options: IResolvePathAliasOptions = {}
+) {
 	let { outResolver, srcResolver } = buildResolvers(destination)
 
-	const files = globby.sync([
-		pathUtil.join(destination, '**/*.js'),
-		pathUtil.join(destination, '**/*.d.ts'),
-	])
+	const { patterns = ['**/*.js'], absoluteOrRelative = 'relative' } = options
+
+	const files = globby.sync(
+		patterns.map((pattern) => pathUtil.join(destination, '/', pattern))
+	)
 
 	files.forEach((file) => {
 		let contents = fs.readFileSync(file).toString()
@@ -65,8 +74,11 @@ export function resolveHashSpruceAliases(destination: string) {
 					throw new Error(`Could not map ${search} in ${file}.`)
 				}
 
-				const relative = pathUtil.relative(pathUtil.dirname(file), resolved)
-				return `${requireOrImport}"./${relative}"`
+				const relative =
+					absoluteOrRelative === 'relative'
+						? './' + pathUtil.relative(pathUtil.dirname(file), resolved)
+						: resolved
+				return `${requireOrImport}"${relative}"`
 			}
 		)
 

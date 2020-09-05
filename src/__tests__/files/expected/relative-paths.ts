@@ -4,14 +4,14 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 //@ts-ignore
-import skill from '#spruce/schemas/fields/fields.types'
+import skill from "./../node_modules/@sprucelabs/schema/build/.spruce/schemas/fields/fields.types"
 //@ts-ignore
-import skill2 from '#spruce/schemas/fields/fields.types'
+import skill2 from "./../node_modules/@sprucelabs/schema/build/.spruce/schemas/fields/fields.types"
 
-import '#spruce/schemas/fields/fields.types'
+import "./../node_modules/@sprucelabs/schema/build/.spruce/schemas/fields/fields.types"
 
-require('#spruce/schemas/fields/fields.types')
-require('#spruce/schemas/fields/fields.types')
+require("./../node_modules/@sprucelabs/schema/build/.spruce/schemas/fields/fields.types")
+require("./../node_modules/@sprucelabs/schema/build/.spruce/schemas/fields/fields.types")
 
 const leaveThis = '#spruce/schemas/fields/fields.types'
 const doNotTouch = '#spruce/schemas/fields/fields.types'
