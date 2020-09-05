@@ -4,20 +4,38 @@ import pathUtil from 'path'
 import AbstractSpruceTest, { test, assert } from '@sprucelabs/test'
 import fsUtil from 'fs-extra'
 import rimraf from 'rimraf'
-import { copy, resolveHashSpruceAliases } from '../../index'
+import { copy, resolvePathAliases, IResolvePathAliasOptions } from '../../index'
+
+const isDebug = false && process.debugPort > 0
 
 export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 	protected static testDirsToDelete: string[] = []
 
 	protected static async afterAll() {
 		await super.afterAll()
+
 		for (const dir of this.testDirsToDelete) {
 			rimraf.sync(dir)
 		}
+
+		this.testDirsToDelete = []
 	}
 
-	@test()
-	protected static async buildsSchemaWithoutErrorWithoutLocalHashSpruce() {
+	protected static async afterEach() {
+		await super.afterEach()
+
+		for (const dir of this.testDirsToDelete) {
+			rimraf.sync(dir)
+		}
+
+		this.testDirsToDelete = []
+	}
+
+	@test('builds and resolves without local hash spruce (direct command)')
+	@test('builds and resolves without local hash spruce (command line)', true)
+	protected static async buildsSchemaWithoutErrorWithoutLocalHashSpruce(
+		useCommandLine?: boolean
+	) {
 		const cwd = await this.setupNewPackage()
 
 		const fieldFactoryFile = this.fieldFactoryFilepath(cwd)
@@ -25,7 +43,7 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 
 		assert.doesInclude(contents, '#spruce')
 
-		this.copyAndMap(cwd)
+		await this.copyAndMap(cwd, { useCommandLine })
 
 		const afterMapContents = fsUtil.readFileSync(fieldFactoryFile).toString()
 
@@ -37,13 +55,92 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 		)
 	}
 
-	private static copyAndMap(cwd: string) {
+	private static async copyAndMap(
+		cwd: string,
+		options: IResolvePathAliasOptions & { useCommandLine?: boolean } = {}
+	) {
 		copy({ cwd, destination: cwd })
-		resolveHashSpruceAliases(cwd)
+		const { useCommandLine = false, ...resolveOptions } = options
+
+		if (useCommandLine) {
+			await this.resolvePathAliasesUsingCommandLine(cwd, resolveOptions)
+		} else {
+			resolvePathAliases(cwd, resolveOptions)
+		}
 	}
 
-	@test()
-	protected static async testVariousMatches() {
+	private static async resolvePathAliasesUsingCommandLine(
+		cwd: string,
+		resolveOptions: {
+			patterns?: string[] | undefined
+			absoluteOrRelative?: 'absolute' | 'relative' | undefined
+		}
+	) {
+		const fullOptions = { target: cwd, ...resolveOptions }
+
+		const args = Object.keys(fullOptions).reduce((args, key) => {
+			args += ` --${key} ${fullOptions[key as keyof typeof fullOptions]}`
+			return args
+		}, '')
+
+		const command = `node${
+			isDebug ? ' --inspect-brk=9230' : ''
+		} ${this.resolvePath('build', 'resolve-path-aliases.js')} ./ ${args}`
+
+		await this.executeCommand(cwd, command)
+	}
+
+	@test(
+		'resolve paths relatively',
+		'test-import.d.ts',
+		{
+			patterns: ['**/*.d.ts'],
+		},
+		'relative-paths.ts'
+	)
+	@test(
+		'resolve paths relatively (command line)',
+		'test-import.d.ts',
+		{
+			patterns: ['**/*.d.ts'],
+			useCommandLine: true,
+		},
+		'relative-paths.ts'
+	)
+	@test(
+		'skips files based on pattern',
+		'test-import.d.ts',
+		{ patterns: ['**/*.js'] },
+		'skipped-paths.ts'
+	)
+	@test(
+		'skips files based on pattern (command line)',
+		'test-import.d.ts',
+		{ patterns: ['**/*.js'], useCommandLine: true },
+		'skipped-paths.ts'
+	)
+	@test(
+		'resolve paths absolutely',
+		'test-import.js',
+		{
+			absoluteOrRelative: 'absolute',
+		},
+		'absolute-paths.ts'
+	)
+	@test(
+		'resolve paths absolutely (command line)',
+		'test-import.js',
+		{
+			absoluteOrRelative: 'absolute',
+			useCommandLine: true,
+		},
+		'absolute-paths.ts'
+	)
+	protected static async testVariousMatches(
+		$importFileName: string,
+		options: IResolvePathAliasOptions = {},
+		expectedFileMatch: string
+	) {
 		const cwd = await this.setupNewPackage()
 
 		const importFileTarget = this.resolvePath(
@@ -54,37 +151,29 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 		)
 
 		const importFileContents = fsUtil.readFileSync(importFileTarget)
-		const destination = this.resolvePath(cwd, 'src', 'test-import.d.ts')
+		const destination = this.resolvePath(cwd, 'src', $importFileName)
+
 		fsUtil.ensureDirSync(pathUtil.dirname(destination))
 		fsUtil.writeFileSync(destination, importFileContents)
 
-		this.copyAndMap(cwd)
+		await this.copyAndMap(cwd, options)
 
 		const updatedContents = fsUtil.readFileSync(destination).toString()
-		assert.isEqual(
-			updatedContents.trim(),
-			`/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-//@ts-ignore
-import skill from "./../node_modules/@sprucelabs/schema/build/.spruce/schemas/fields/fields.types"
-//@ts-ignore
-import skill2 from "./../node_modules/@sprucelabs/schema/build/.spruce/schemas/fields/fields.types"
 
-import "./../node_modules/@sprucelabs/schema/build/.spruce/schemas/fields/fields.types"
-
-require("./../node_modules/@sprucelabs/schema/build/.spruce/schemas/fields/fields.types")
-require("./../node_modules/@sprucelabs/schema/build/.spruce/schemas/fields/fields.types")
-
-const leaveThis = '#spruce/schemas/fields/fields.types'
-const doNotTouch = '#spruce/schemas/fields/fields.types'
-
-console.log(leaveThis, doNotTouch)
-function leaveAsIs(str: string) {
-	console.log(str)
-}
-
-leaveAsIs('#spruce/schemas/fields/fields.types')`
+		const expectedPath = this.resolvePath(
+			'src',
+			'__tests__',
+			'files',
+			'expected',
+			expectedFileMatch
 		)
+
+		const expectedContents = fsUtil
+			.readFileSync(expectedPath)
+			.toString()
+			.replace(/{{cwd}}/gis, cwd)
+
+		assert.isEqual(updatedContents.trim(), expectedContents.trim())
 	}
 
 	private static fieldFactoryFilepath(cwd: string) {
@@ -95,8 +184,14 @@ leaveAsIs('#spruce/schemas/fields/fields.types')`
 		)
 	}
 
-	@test()
-	protected static async buildsSchemaAndUsesTheLocalHashSpruceVersionOfFiles() {
+	@test('build schema and use local hash spruce version of files', false)
+	@test(
+		'build schema and use local hash spruce version of files (command line)',
+		true
+	)
+	protected static async buildsSchemaAndUsesTheLocalHashSpruceVersionOfFiles(
+		useCommandLine?: boolean
+	) {
 		const cwd = await this.setupNewPackage()
 
 		// copy schema files
@@ -112,7 +207,7 @@ leaveAsIs('#spruce/schemas/fields/fields.types')`
 
 		await this.copyDir(sourceHashSpruce, destinationHashSpruce)
 
-		this.copyAndMap(cwd)
+		await this.copyAndMap(cwd, { useCommandLine })
 
 		const fieldFactoryFile = this.fieldFactoryFilepath(cwd)
 		const afterMapContents = fsUtil.readFileSync(fieldFactoryFile).toString()
@@ -133,6 +228,7 @@ leaveAsIs('#spruce/schemas/fields/fields.types')`
 
 		const buildIndex = this.resolvePath('build', 'index.js')
 		const babelFile = this.resolvePath(cwd, 'babel.config.js')
+
 		let babelContents = fsUtil
 			.readFileSync(babelFile)
 			.toString()
@@ -140,8 +236,8 @@ leaveAsIs('#spruce/schemas/fields/fields.types')`
 
 		fsUtil.writeFileSync(babelFile, babelContents)
 
-		await this.runCommand(cwd, 'yarn')
-		await this.runCommand(cwd, 'yarn build')
+		await this.executeCommand(cwd, 'yarn')
+		await this.executeCommand(cwd, 'yarn build')
 
 		const checkFile = this.fieldFactoryFilepath(cwd)
 		const checkFileContents = fsUtil.readFileSync(checkFile).toString()
@@ -207,10 +303,13 @@ leaveAsIs('#spruce/schemas/fields/fields.types')`
 	}
 
 	private static async invokeYarnCommands(cwd: string) {
-		await this.runCommand(cwd, `yarn init --yes && yarn add @sprucelabs/schema`)
+		await this.executeCommand(
+			cwd,
+			`yarn init --yes && yarn add @sprucelabs/schema`
+		)
 	}
 
-	private static async runCommand(cwd: string, command: string) {
+	private static async executeCommand(cwd: string, command: string) {
 		await new Promise((resolve, reject) => {
 			exec(
 				command,
