@@ -31,7 +31,7 @@
 		"globby": "^11.0.1",
 		"rimraf": "^3.0.2",
 		"tsconfig-paths": "^3.9.0",
-		"yargs": "^15.4.1"
+		"yargs": "^16.0.0"
 	},
 	"devDependencies": {
 		"@sprucelabs/semantic-release": "^4.0.5",
