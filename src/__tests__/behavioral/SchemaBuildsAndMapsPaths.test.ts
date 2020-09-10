@@ -204,10 +204,22 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 		)
 
 		const destinationHashSpruce = this.resolvePath(cwd, 'src', '.spruce')
-
 		await this.copyDir(sourceHashSpruce, destinationHashSpruce)
 
-		await this.copyAndMap(cwd, { useCommandLine })
+		// copy schema.types example
+		const sourceSchemaTypes = this.resolvePath('src', '__tests__', 'files')
+
+		const schemaTypesDestination = this.resolvePath(
+			destinationHashSpruce,
+			'schemas'
+		)
+
+		await this.copyDir(sourceSchemaTypes, schemaTypesDestination)
+
+		await this.copyAndMap(cwd, {
+			useCommandLine,
+			patterns: ['**/*.js', '**/*.d.ts'],
+		})
 
 		const fieldFactoryFile = this.fieldFactoryFilepath(cwd)
 		const afterMapContents = fsUtil.readFileSync(fieldFactoryFile).toString()
@@ -216,6 +228,17 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 		assert.doesInclude(
 			afterMapContents,
 			'./../../../../../build/.spruce/schemas/fields/fieldClassMap'
+		)
+
+		const schemaTypesFile = this.resolvePath(
+			schemaTypesDestination,
+			'schemas.types.d.ts'
+		)
+		const schemaTypesContent = fsUtil.readFileSync(schemaTypesFile).toString()
+		assert.doesNotInclude(schemaTypesContent, '#spruce')
+		assert.doesInclude(
+			schemaTypesContent,
+			'./../../../build/.spruce/schemas/fields/fieldTypeEnum'
 		)
 	}
 
