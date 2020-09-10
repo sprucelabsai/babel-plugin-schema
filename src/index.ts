@@ -48,7 +48,10 @@ export function resolvePathAliases(
 	const { patterns = ['**/*.js'], absoluteOrRelative = 'relative' } = options
 
 	const files = globby.sync(
-		patterns.map((pattern) => pathUtil.join(destination, '/', pattern))
+		patterns.map((pattern) => pathUtil.join(destination, '/', pattern)),
+		{
+			dot: true,
+		}
 	)
 
 	files.forEach((file) => {
