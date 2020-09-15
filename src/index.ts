@@ -19,7 +19,8 @@ function assert(truthy: any, message: string) {
 export interface PluginOptions {
 	cwd: string
 	destination: string
-	resolvePathAliases?: boolean
+	shouldResolvePathAliases?: boolean
+	resolveOptions?: IResolvePathAliasOptions
 }
 
 export interface IResolvePathAliasOptions {
@@ -39,8 +40,8 @@ export function copy(options: PluginOptions) {
 
 	const destination = ensureDirsAndResolveDestination(options)
 
-	if (options.resolvePathAliases !== false) {
-		resolvePathAliases(destination)
+	if (options.shouldResolvePathAliases !== false) {
+		resolvePathAliases(destination, options.resolveOptions)
 	}
 }
 
@@ -181,7 +182,8 @@ function ensureDirsAndResolveDestination(options: PluginOptions) {
 	if (fs.existsSync(schemaNodeModules)) {
 		rimRaf.sync(schemaNodeModules)
 	}
-	return destination
+
+	return pathUtil.join(destination, 'build')
 }
 
 export default function (_: any, options: PluginOptions) {
