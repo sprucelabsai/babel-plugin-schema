@@ -4,7 +4,7 @@ import pathUtil from 'path'
 import AbstractSpruceTest, { test, assert } from '@sprucelabs/test'
 import fsUtil from 'fs-extra'
 import rimraf from 'rimraf'
-import { copy, resolvePathAliases, IResolvePathAliasOptions } from '../../index'
+import { copy, IResolvePathAliasOptions, resolvePathAliases } from '../../index'
 
 const isDebug = false && process.debugPort > 0
 
@@ -43,7 +43,7 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 
 		assert.doesInclude(contents, '#spruce')
 
-		await this.copyAndMap(cwd, { useCommandLine })
+		await this.copyAndResolvePaths(cwd, { useCommandLine })
 
 		const afterMapContents = fsUtil.readFileSync(fieldFactoryFile).toString()
 
@@ -55,17 +55,42 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 		)
 	}
 
-	private static async copyAndMap(
+	private static async copyAndResolvePaths(
 		cwd: string,
 		options: IResolvePathAliasOptions & { useCommandLine?: boolean } = {}
 	) {
-		copy({ cwd, destination: cwd })
 		const { useCommandLine = false, ...resolveOptions } = options
 
+		copy({
+			cwd,
+			destination: cwd,
+			shouldResolvePathAliases: !options.useCommandLine,
+			resolveOptions,
+		})
+
+		const schemaPath = this.resolvePath(
+			cwd,
+			'node_modules',
+			'@sprucelabs',
+			'schema'
+		)
+
+		const srcPath = this.resolvePath(cwd, 'src')
+		const srcExists = fsUtil.existsSync(srcPath)
+
 		if (useCommandLine) {
-			await this.resolvePathAliasesUsingCommandLine(cwd, resolveOptions)
+			const promise1 = this.resolvePathAliasesUsingCommandLine(
+				schemaPath,
+				resolveOptions
+			)
+			const promise2 = srcExists
+				? this.resolvePathAliasesUsingCommandLine(srcPath, resolveOptions)
+				: Promise.resolve()
+
+			await Promise.all([promise1, promise2])
 		} else {
-			resolvePathAliases(cwd, resolveOptions)
+			resolvePathAliases(schemaPath, resolveOptions)
+			srcExists && resolvePathAliases(srcPath, resolveOptions)
 		}
 	}
 
@@ -137,8 +162,8 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 		'absolute-paths.ts'
 	)
 	protected static async testVariousMatches(
-		$importFileName: string,
-		options: IResolvePathAliasOptions = {},
+		importFileName: string,
+		options: IResolvePathAliasOptions & { useCommandLine?: boolean } = {},
 		expectedFileMatch: string
 	) {
 		const cwd = await this.setupNewPackage()
@@ -151,15 +176,14 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 		)
 
 		const importFileContents = fsUtil.readFileSync(importFileTarget)
-		const destination = this.resolvePath(cwd, 'src', $importFileName)
+		const destination = this.resolvePath(cwd, 'src', importFileName)
 
 		fsUtil.ensureDirSync(pathUtil.dirname(destination))
 		fsUtil.writeFileSync(destination, importFileContents)
 
-		await this.copyAndMap(cwd, options)
+		await this.copyAndResolvePaths(cwd, options)
 
 		const updatedContents = fsUtil.readFileSync(destination).toString()
-
 		const expectedPath = this.resolvePath(
 			'src',
 			'__tests__',
@@ -216,7 +240,7 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 
 		await this.copyDir(sourceSchemaTypes, schemaTypesDestination)
 
-		await this.copyAndMap(cwd, {
+		await this.copyAndResolvePaths(cwd, {
 			useCommandLine,
 			patterns: ['**/*.js', '**/*.d.ts'],
 		})

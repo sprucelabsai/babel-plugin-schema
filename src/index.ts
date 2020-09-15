@@ -19,6 +19,8 @@ function assert(truthy: any, message: string) {
 export interface PluginOptions {
 	cwd: string
 	destination: string
+	shouldResolvePathAliases?: boolean
+	resolveOptions?: IResolvePathAliasOptions
 }
 
 export interface IResolvePathAliasOptions {
@@ -36,7 +38,11 @@ export function copy(options: PluginOptions) {
 		'You need to pass a options.destination (sub project if mono repo)'
 	)
 
-	ensureDirsAndResolveDestination(options)
+	const destination = ensureDirsAndResolveDestination(options)
+
+	if (options.shouldResolvePathAliases !== false) {
+		resolvePathAliases(destination, options.resolveOptions)
+	}
 }
 
 export function resolvePathAliases(
@@ -176,7 +182,8 @@ function ensureDirsAndResolveDestination(options: PluginOptions) {
 	if (fs.existsSync(schemaNodeModules)) {
 		rimRaf.sync(schemaNodeModules)
 	}
-	return destination
+
+	return pathUtil.join(destination, 'build')
 }
 
 export default function (_: any, options: PluginOptions) {
