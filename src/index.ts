@@ -19,6 +19,7 @@ function assert(truthy: any, message: string) {
 export interface PluginOptions {
 	cwd: string
 	destination: string
+	resolvePathAliases?: boolean
 }
 
 export interface IResolvePathAliasOptions {
@@ -36,7 +37,11 @@ export function copy(options: PluginOptions) {
 		'You need to pass a options.destination (sub project if mono repo)'
 	)
 
-	ensureDirsAndResolveDestination(options)
+	const destination = ensureDirsAndResolveDestination(options)
+
+	if (options.resolvePathAliases !== false) {
+		resolvePathAliases(destination)
+	}
 }
 
 export function resolvePathAliases(

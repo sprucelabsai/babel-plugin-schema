@@ -4,7 +4,7 @@ import pathUtil from 'path'
 import AbstractSpruceTest, { test, assert } from '@sprucelabs/test'
 import fsUtil from 'fs-extra'
 import rimraf from 'rimraf'
-import { copy, resolvePathAliases, IResolvePathAliasOptions } from '../../index'
+import { copy, IResolvePathAliasOptions } from '../../index'
 
 const isDebug = false && process.debugPort > 0
 
@@ -59,13 +59,11 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 		cwd: string,
 		options: IResolvePathAliasOptions & { useCommandLine?: boolean } = {}
 	) {
-		copy({ cwd, destination: cwd })
+		copy({ cwd, destination: cwd, resolvePathAliases: !options.useCommandLine })
 		const { useCommandLine = false, ...resolveOptions } = options
 
 		if (useCommandLine) {
 			await this.resolvePathAliasesUsingCommandLine(cwd, resolveOptions)
-		} else {
-			resolvePathAliases(cwd, resolveOptions)
 		}
 	}
 
