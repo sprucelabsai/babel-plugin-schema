@@ -1,3 +1,10 @@
+# [3.0.0](https://github.com/sprucelabsai/babel-plugin-schema/compare/v2.1.52...v3.0.0) (2020-09-15)
+
+
+### Breaking Changes
+
+* restore map on copy schema ([e38ef33](https://github.com/sprucelabsai/babel-plugin-schema/commit/e38ef33))
+
 ## [2.1.52](https://github.com/sprucelabsai/babel-plugin-schema/compare/v2.1.51...v2.1.52) (2020-09-15)
 
 ## [2.1.51](https://github.com/sprucelabsai/babel-plugin-schema/compare/v2.1.50...v2.1.51) (2020-09-15)
