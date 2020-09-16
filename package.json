@@ -43,7 +43,7 @@
 		"eslint": "^7.9.0",
 		"eslint-config-spruce": "^10.9.47",
 		"jest": "^26.4.2",
-		"prettier": "^2.1.1",
+		"prettier": "^2.1.2",
 		"typescript": "^4.0.2"
 	},
 	"jest": {
