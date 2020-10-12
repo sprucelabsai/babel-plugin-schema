@@ -31,30 +31,6 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 		this.testDirsToDelete = []
 	}
 
-	@test('builds and resolves without local hash spruce (direct command)')
-	@test('builds and resolves without local hash spruce (command line)', true)
-	protected static async buildsSchemaWithoutErrorWithoutLocalHashSpruce(
-		useCommandLine?: boolean
-	) {
-		const cwd = await this.setupNewPackage()
-
-		const fieldFactoryFile = this.fieldFactoryFilepath(cwd)
-		const contents = fsUtil.readFileSync(fieldFactoryFile).toString()
-
-		assert.doesInclude(contents, '#spruce')
-
-		await this.copyAndResolvePaths(cwd, { useCommandLine })
-
-		const afterMapContents = fsUtil.readFileSync(fieldFactoryFile).toString()
-
-		assert.doesNotInclude(afterMapContents, cwd)
-		assert.doesNotInclude(afterMapContents, '#spruce')
-		assert.doesInclude(
-			afterMapContents,
-			'./../.spruce/schemas/fields/fieldClassMap'
-		)
-	}
-
 	private static async copyAndResolvePaths(
 		cwd: string,
 		options: IResolvePathAliasOptions & { useCommandLine?: boolean } = {}
@@ -208,64 +184,6 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 		)
 	}
 
-	@test('build schema and use local hash spruce version of files', false)
-	@test(
-		'build schema and use local hash spruce version of files (command line)',
-		true
-	)
-	protected static async buildsSchemaAndUsesTheLocalHashSpruceVersionOfFiles(
-		useCommandLine?: boolean
-	) {
-		const cwd = await this.setupNewPackage()
-
-		// copy schema files
-		const sourceHashSpruce = this.resolvePath(
-			cwd,
-			'node_modules',
-			'@sprucelabs/schema',
-			'build',
-			'.spruce'
-		)
-
-		const destinationHashSpruce = this.resolvePath(cwd, 'src', '.spruce')
-		await this.copyDir(sourceHashSpruce, destinationHashSpruce)
-
-		// copy schema.types example
-		const sourceSchemaTypes = this.resolvePath('src', '__tests__', 'files')
-
-		const schemaTypesDestination = this.resolvePath(
-			destinationHashSpruce,
-			'schemas'
-		)
-
-		await this.copyDir(sourceSchemaTypes, schemaTypesDestination)
-
-		await this.copyAndResolvePaths(cwd, {
-			useCommandLine,
-			patterns: ['**/*.js', '**/*.d.ts'],
-		})
-
-		const fieldFactoryFile = this.fieldFactoryFilepath(cwd)
-		const afterMapContents = fsUtil.readFileSync(fieldFactoryFile).toString()
-
-		assert.doesNotInclude(afterMapContents, '#spruce')
-		assert.doesInclude(
-			afterMapContents,
-			'./../../../../../build/.spruce/schemas/fields/fieldClassMap'
-		)
-
-		const schemaTypesFile = this.resolvePath(
-			schemaTypesDestination,
-			'schemas.types.d.ts'
-		)
-		const schemaTypesContent = fsUtil.readFileSync(schemaTypesFile).toString()
-		assert.doesNotInclude(schemaTypesContent, '#spruce')
-		assert.doesInclude(
-			schemaTypesContent,
-			'./../../../build/.spruce/schemas/fields/fieldTypeEnum'
-		)
-	}
-
 	@test()
 	protected static async testBuildingFullSkillWithBabel() {
 		const cwd = await this.setupNewCwd()
@@ -289,6 +207,7 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 		const checkFile = this.fieldFactoryFilepath(cwd)
 		const checkFileContents = fsUtil.readFileSync(checkFile).toString()
 
+		debugger
 		assert.doesNotInclude(checkFileContents, 'src/.spruce')
 		assert.doesInclude(
 			checkFileContents,
