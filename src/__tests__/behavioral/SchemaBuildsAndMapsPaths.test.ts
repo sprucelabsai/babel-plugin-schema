@@ -184,53 +184,6 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 		)
 	}
 
-	@test()
-	protected static async testBuildingFullSkillWithBabel() {
-		const cwd = await this.setupNewCwd()
-
-		const sourceDir = this.resolvePath('src', '__tests__', 'empty_skill')
-		await this.copyDir(sourceDir, cwd)
-
-		const buildIndex = this.resolvePath('build', 'index.js')
-		const babelFile = this.resolvePath(cwd, 'babel.config.js')
-
-		let babelContents = fsUtil
-			.readFileSync(babelFile)
-			.toString()
-			.replace('{{schema-plugin}}', buildIndex)
-
-		fsUtil.writeFileSync(babelFile, babelContents)
-
-		await this.executeCommand(cwd, 'yarn')
-		await this.executeCommand(cwd, 'yarn build')
-
-		const checkFile = this.fieldFactoryFilepath(cwd)
-		const checkFileContents = fsUtil.readFileSync(checkFile).toString()
-
-		debugger
-		assert.doesNotInclude(checkFileContents, 'src/.spruce')
-		assert.doesInclude(
-			checkFileContents,
-			'./../../../../../build/.spruce/schemas/fields/fieldClassMap'
-		)
-	}
-
-	private static async copyDir(source: string, destination: string) {
-		await fsUtil.ensureDir(destination)
-		return new Promise((resolve) => {
-			exec(
-				`cd ${source} && tar cf - . | (cd ${destination}; tar xf -)`,
-				{ maxBuffer: 1024 * 1024 * 5 },
-				(err, stdout) => {
-					if (err) {
-						throw err
-					}
-					resolve(stdout)
-				}
-			)
-		})
-	}
-
 	private static async setupNewPackage() {
 		const cwd = await this.setupNewCwd()
 
