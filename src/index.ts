@@ -1,5 +1,6 @@
 import fs from 'fs'
 import pathUtil from 'path'
+import chalk from 'chalk'
 import fsExtra from 'fs-extra'
 import globby from 'globby'
 import rimRaf from 'rimraf'
@@ -26,6 +27,7 @@ export interface PluginOptions {
 export interface IResolvePathAliasOptions {
 	patterns?: string[]
 	absoluteOrRelative?: 'relative' | 'absolute'
+	beVerbose?: boolean
 }
 
 export function copy(options: PluginOptions) {
@@ -45,13 +47,33 @@ export function copy(options: PluginOptions) {
 	}
 }
 
+const logStub = {
+	info: () => {},
+	warning: () => {},
+	error: () => {},
+}
+
+const logLive = {
+	info: (...message: string[]) => console.log(chalk.italic(...message)),
+	warning: (...message: string[]) => console.log(chalk.yellow(...message)),
+	error: (...message: string[]) => console.log(chalk.red(...message)),
+}
+
 export function resolvePathAliases(
 	destination: string,
 	options: IResolvePathAliasOptions = {}
 ) {
 	let { outResolver, srcResolver } = buildResolvers(destination)
 
-	const { patterns = ['**/*.js'], absoluteOrRelative = 'relative' } = options
+	const {
+		patterns = ['**/*.js'],
+		absoluteOrRelative = 'relative',
+		beVerbose: isVerbose = false,
+	} = options
+
+	const log = isVerbose ? logLive : logStub
+	let totalMappedPaths = 0
+	let totalFilesWithMappedPaths = 0
 
 	const files = globby.sync(
 		patterns.map((pattern) => pathUtil.join(destination, '/', pattern)),
@@ -59,6 +81,8 @@ export function resolvePathAliases(
 			dot: true,
 		}
 	)
+
+	log.info(`Checking ${files.length} files for path aliases...`)
 
 	files.forEach((file) => {
 		let contents = fs.readFileSync(file).toString()
@@ -70,6 +94,8 @@ export function resolvePathAliases(
 				found = true
 				const search = match
 				let resolved: string | undefined
+
+				log.info('Found', search, 'in', file)
 
 				if (outResolver) {
 					resolved = outResolver(search, undefined, undefined, ['.ts', '.js'])
@@ -83,6 +109,8 @@ export function resolvePathAliases(
 					throw new Error(`Could not map ${search} in ${file}.`)
 				}
 
+				totalMappedPaths++
+
 				const relative =
 					absoluteOrRelative === 'relative'
 						? './' + pathUtil.relative(pathUtil.dirname(file), resolved)
@@ -92,9 +120,15 @@ export function resolvePathAliases(
 		)
 
 		if (found) {
+			totalFilesWithMappedPaths++
 			fs.writeFileSync(file, contents)
 		}
 	})
+
+	return {
+		totalMappedPaths,
+		totalFilesWithMappedPaths,
+	}
 }
 
 function buildResolvers(

@@ -27,6 +27,7 @@
 		"copy-test-empty-skill": "rm -rf ./build/__tests__/empty_skill && mkdirp ./build/__tests__/empty_skill && cp -r ./src/__tests__/empty_skill/* ./build/__tests__/empty_skill"
 	},
 	"dependencies": {
+		"chalk": "^4.1.0",
 		"fs-extra": "^9.0.1",
 		"globby": "^11.0.1",
 		"rimraf": "^3.0.2",
