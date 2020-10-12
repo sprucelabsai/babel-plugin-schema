@@ -1,3 +1,10 @@
+# [3.1.0](https://github.com/sprucelabsai/babel-plugin-schema/compare/v3.0.15...v3.1.0) (2020-10-12)
+
+
+### Features
+
+* beVerbose flag on cli ([7c38117](https://github.com/sprucelabsai/babel-plugin-schema/commit/7c38117))
+
 ## [3.0.15](https://github.com/sprucelabsai/babel-plugin-schema/compare/v3.0.14...v3.0.15) (2020-09-17)
 
 ## [3.0.14](https://github.com/sprucelabsai/babel-plugin-schema/compare/v3.0.13...v3.0.14) (2020-09-17)
