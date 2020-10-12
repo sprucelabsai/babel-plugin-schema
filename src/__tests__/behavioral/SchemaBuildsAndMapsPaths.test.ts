@@ -176,14 +176,6 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 		assert.isEqual(updatedContents.trim(), expectedContents.trim())
 	}
 
-	private static fieldFactoryFilepath(cwd: string) {
-		return this.resolvePath(
-			cwd,
-			'node_modules/@sprucelabs/schema',
-			'build/factories/FieldFactory.js'
-		)
-	}
-
 	private static async setupNewPackage() {
 		const cwd = await this.setupNewCwd()
 
