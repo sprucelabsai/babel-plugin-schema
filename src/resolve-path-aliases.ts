@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import pathUtil from 'path'
+import chalk from 'chalk'
 import yargs from 'yargs'
 import { resolvePathAliases } from './index'
 
@@ -10,6 +11,10 @@ const argv = yargs.options({
 	patterns: {
 		desc: 'Comma separated list of globby patterns, default to **/*.js',
 	},
+	verbose: {
+		alias: 'v',
+		desc: 'Output more information while mapping',
+	},
 	absoluteOrRelative: {
 		valid: '',
 		desc:
@@ -17,19 +22,40 @@ const argv = yargs.options({
 	},
 }).argv
 
-const { patterns, target, absoluteOrRelative } = argv as {
+const { patterns, target, absoluteOrRelative, verbose } = argv as {
 	patterns?: string
 	target?: string
 	absoluteOrRelative?: 'relative' | 'absolute'
+	verbose?: boolean
 }
 const cwd =
 	target && target[0] === pathUtil.sep
 		? target
 		: pathUtil.join(process.cwd(), target ?? '')
 
-console.log(`About to map tsconfig paths in ${cwd}`)
-resolvePathAliases(cwd, {
+const processCwd = process.cwd()
+
+console.log(
+	chalk.green(
+		`Mapping tsconfig paths in '${pathUtil.relative(processCwd, cwd)}'`
+	)
+)
+const results = resolvePathAliases(cwd, {
 	absoluteOrRelative,
 	patterns: patterns ? patterns.split(',') : undefined,
+	beVerbose: verbose,
 })
-console.log('Done!')
+
+if (results.totalMappedPaths === 0) {
+	console.log(
+		chalk.green.bold(
+			'Done! Nothing to map. Maybe mapping was already done? Try building your code again.'
+		)
+	)
+} else {
+	console.log(
+		chalk.green.bold(
+			`Done! Mapped ${results.totalMappedPaths} across ${results.totalFilesWithMappedPaths} files.`
+		)
+	)
+}
