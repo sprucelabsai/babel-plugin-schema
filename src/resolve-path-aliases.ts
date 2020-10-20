@@ -49,13 +49,13 @@ const results = resolvePathAliases(cwd, {
 if (results.totalMappedPaths === 0) {
 	console.log(
 		chalk.green.bold(
-			'Done! Nothing to map. Maybe mapping was already done? Try building your code again.'
+			'Done! No paths to map. Maybe mapping was already done? Try building your code again.'
 		)
 	)
 } else {
 	console.log(
 		chalk.green.bold(
-			`Done! Mapped ${results.totalMappedPaths} across ${results.totalFilesWithMappedPaths} files.`
+			`Done! Mapped ${results.totalMappedPaths} paths across ${results.totalFilesWithMappedPaths} files.`
 		)
 	)
 }
