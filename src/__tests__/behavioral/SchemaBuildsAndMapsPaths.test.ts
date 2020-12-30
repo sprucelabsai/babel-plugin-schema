@@ -234,7 +234,7 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 					if (err) {
 						reject(err)
 					} else {
-						resolve()
+						resolve(undefined)
 					}
 				}
 			)
