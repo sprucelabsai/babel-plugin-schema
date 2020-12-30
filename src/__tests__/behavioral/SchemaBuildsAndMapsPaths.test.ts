@@ -61,7 +61,7 @@ export default class SchemaBuildsAndMapsPathsTest extends AbstractSpruceTest {
 			)
 			const promise2 = srcExists
 				? this.resolvePathAliasesUsingCommandLine(srcPath, resolveOptions)
-				: Promise.resolve()
+				: Promise.resolve(undefined)
 
 			await Promise.all([promise1, promise2])
 		} else {
