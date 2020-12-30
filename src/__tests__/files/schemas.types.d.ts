@@ -805,7 +805,7 @@ export declare namespace SpruceSchemas.Local.v2020_09_01 {
 export declare namespace SpruceSchemas.Local.v2020_09_01 {
 	export interface IMercuryContract {
 		/** . */
-		[eventNameWithOptionalNamespace: string]:
+		[fullyQualifiedEventName: string]:
 		| SpruceSchemas.Local.v2020_09_01.IEventSignature
 		| undefined
 		| null;
