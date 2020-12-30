@@ -1,3 +1,10 @@
+# [4.0.0](https://github.com/sprucelabsai/babel-plugin-schema/compare/v3.1.2...v4.0.0) (2020-12-30)
+
+
+### Breaking Changes
+
+* eventNameWithOptionalNamespace -> fullyQualifiedEventName ([f5a34c9](https://github.com/sprucelabsai/babel-plugin-schema/commit/f5a34c9))
+
 ## [3.1.2](https://github.com/sprucelabsai/babel-plugin-schema/compare/v3.1.1...v3.1.2) (2020-10-20)
 
 ## [3.1.1](https://github.com/sprucelabsai/babel-plugin-schema/compare/v3.1.0...v3.1.1) (2020-10-12)
