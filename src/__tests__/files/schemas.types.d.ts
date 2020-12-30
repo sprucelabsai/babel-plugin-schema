@@ -816,7 +816,7 @@ export declare namespace SpruceSchemas.Local.v2020_09_01 {
 		name: "Mercury Contract";
 		dynamicFieldSignature: {
 			type: 'schema',
-			keyName: "eventNameWithOptionalNamespace";
+			keyName: "fullyQualifiedEventName";
 			options: {
 				schema: SpruceSchemas.Local.v2020_09_01.IEventSignatureSchema;
 			};
